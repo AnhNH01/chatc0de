@@ -33,6 +33,9 @@ repositories {
 dependencies {
     testImplementation(libs.junit)
 
+    // Lib to work with http
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
