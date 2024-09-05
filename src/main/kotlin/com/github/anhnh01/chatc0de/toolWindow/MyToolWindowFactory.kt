@@ -1,6 +1,5 @@
 package com.github.anhnh01.chatc0de.toolWindow
 
-import com.github.anhnh01.chatc0de.MyBundle
 import com.github.anhnh01.chatc0de.services.MyProjectService
 import com.github.anhnh01.chatc0de.ui.Message
 import com.intellij.openapi.components.service
@@ -9,11 +8,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBList
+import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
+import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
@@ -24,7 +23,7 @@ import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JButton
-import javax.swing.border.Border
+import javax.swing.ScrollPaneConstants
 
 
 class MyToolWindowFactory : ToolWindowFactory {
@@ -47,12 +46,17 @@ class MyToolWindowFactory : ToolWindowFactory {
         private var isSendingMsg = false
 
         private val listMsg = JBPanel<JBPanel<*>>().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            layout = VerticalLayout(JBUI.scale(8))
             border = BorderFactory.createEmptyBorder(5, 10, 5, 10)
         }
 
-        private val listMsgScrollPane = JBScrollPane(listMsg).apply {
+        private val listMsgScrollPane = JBScrollPane(
+            listMsg,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+        ).apply {
             border = null
+            verticalScrollBar.autoscrolls = true
         }
 
         private val textArea = JBTextArea(5, 20).apply {
@@ -85,7 +89,7 @@ class MyToolWindowFactory : ToolWindowFactory {
 
                             // Only allow for one message at one time, user have to wait for the bot to respond before
                             // sending another message
-                            if(!isSendingMsg) performAction()
+                            if (!isSendingMsg) performAction()
                         }
                     } else {
                         super.keyPressed(e)
@@ -96,12 +100,12 @@ class MyToolWindowFactory : ToolWindowFactory {
         }
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
-
-            val label = JBLabel(MyBundle.message("randomLabel", "?"))
-
             layout = BorderLayout()
+            val splitter = OnePixelSplitter(true, .98f)
+            splitter.dividerWidth = 2
 
-            add(label, BorderLayout.CENTER)
+            add(splitter)
+            splitter.firstComponent = listMsgScrollPane
 
             val inputPanel = JBPanel<JBPanel<*>>().apply {
                 layout = BorderLayout()
@@ -127,19 +131,11 @@ class MyToolWindowFactory : ToolWindowFactory {
 
             }
 
-            add(JButton(MyBundle.message("shuffle")).apply {
-                addActionListener {
-                    label.text = MyBundle.message("randomLabel", service.getRandomNumber())
-                }
-            }, BorderLayout.SOUTH)
-
-
             val inputContainerPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
                 border = JBUI.Borders.customLineTop(JBUI.CurrentTheme.Editor.BORDER_COLOR)
                 add(inputPanel, BorderLayout.CENTER)
             }
             add(inputContainerPanel, BorderLayout.SOUTH)
-            add(listMsgScrollPane, BorderLayout.CENTER)
         }
 
 
@@ -152,7 +148,7 @@ class MyToolWindowFactory : ToolWindowFactory {
             toggleSendBtn()
             addMessage(msgContent, isPrompt = true)
 
-            this.service.performActionThreaded(msgContent, this)
+            this.service.getBotResponseMessage(msgContent, this)
         }
 
         fun addMessage(msgContent: String, isPrompt: Boolean = false) {
