@@ -1,5 +1,6 @@
 package com.github.anhnh01.chatc0de.toolWindow
 
+import com.github.anhnh01.chatc0de.ChatC0deIcons
 import com.github.anhnh01.chatc0de.services.MyProjectService
 import com.github.anhnh01.chatc0de.ui.Message
 import com.intellij.openapi.components.service
@@ -15,9 +16,7 @@ import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
-import java.awt.BorderLayout
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
+import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
@@ -61,7 +60,7 @@ class MyToolWindowFactory : ToolWindowFactory {
 
         private val textArea = JBTextArea(5, 20).apply {
 
-            emptyText.setText("Chat with AI, press ENTER to send, SHIFT + ENTER to insert newline")
+            emptyText.setText("Ask anything...")
             lineWrap = true
             wrapStyleWord = true
             border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
@@ -69,21 +68,12 @@ class MyToolWindowFactory : ToolWindowFactory {
             background = JBColor(0xFFFFFF, 0x303134)
             foreground = JBColor(0x303134, 0xFFFFFF)
             caretColor = JBColor(0x303134, 0xFFFFFF)
-        }
-        private val sendMessageButton = JButton("Send message")
 
-        init {
-            sendMessageButton.addActionListener {
-                performAction()
-            }
-
-
-            // Allow user to send message by pressing ENTER key. User can inset newline with SHIFT + ENTER
-            textArea.addKeyListener(object : KeyAdapter() {
+            addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         if (e.isShiftDown)
-                            textArea.insert("\n", textArea.caretPosition)
+                            insert("\n", caretPosition)
                         else {
                             e.consume()
 
@@ -98,6 +88,18 @@ class MyToolWindowFactory : ToolWindowFactory {
                 }
             })
         }
+        private val sendMessageButton = JButton("Send", ChatC0deIcons.SEND).apply {
+            isOpaque = false
+            addActionListener {
+                performAction()
+            }
+        }
+
+        private val actionPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
+            isOpaque = false
+            add(sendMessageButton, BorderLayout.EAST)
+        }
+
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
             layout = BorderLayout()
@@ -109,33 +111,18 @@ class MyToolWindowFactory : ToolWindowFactory {
 
             val inputPanel = JBPanel<JBPanel<*>>().apply {
                 layout = BorderLayout()
-                border = BorderFactory.createEmptyBorder(0, 0, 0, 2)
-
+                background = JBColor(0xFFFFFF, 0x303134)
+                border = JBUI.Borders.customLineTop(JBUI.CurrentTheme.Editor.BORDER_COLOR)
+                isOpaque = true
                 val textPane = JBScrollPane(textArea).apply {
                     border = null
                 }
 
                 add(textPane, BorderLayout.CENTER)
-
-                val gridBagConstraints = GridBagConstraints().apply {
-                    gridx = 0
-                    gridy = 0
-                    weighty = 1.0
-                    anchor = GridBagConstraints.CENTER
-                }
-                val btnPanel = JBPanel<JBPanel<*>>(GridBagLayout()).apply {
-                    add(sendMessageButton, gridBagConstraints)
-                }
-
-                add(btnPanel, BorderLayout.EAST)
-
+                add(actionPanel, BorderLayout.SOUTH)
             }
 
-            val inputContainerPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
-                border = JBUI.Borders.customLineTop(JBUI.CurrentTheme.Editor.BORDER_COLOR)
-                add(inputPanel, BorderLayout.CENTER)
-            }
-            add(inputContainerPanel, BorderLayout.SOUTH)
+            add(inputPanel, BorderLayout.SOUTH)
         }
 
 
@@ -162,7 +149,6 @@ class MyToolWindowFactory : ToolWindowFactory {
             this.isSendingMsg = !this.isSendingMsg
             this.sendMessageButton.isEnabled = !this.sendMessageButton.isEnabled
         }
-
 
     }
 }
