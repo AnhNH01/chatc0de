@@ -1,12 +1,12 @@
 package com.github.anhnh01.chatc0de.services
 
+import com.github.anhnh01.chatc0de.toolWindow.MyToolWindowFactory
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.anhnh01.chatc0de.MyBundle
-import com.github.anhnh01.chatc0de.toolWindow.MyToolWindowFactory
-import com.intellij.openapi.application.ApplicationManager
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okio.IOException
 
 @Service(Service.Level.PROJECT)
