@@ -1,6 +1,6 @@
 package com.github.anhnh01.chatc0de.services
 
-import com.github.anhnh01.chatc0de.toolWindow.MyToolWindowFactory
+import com.github.anhnh01.chatc0de.ui.ChatPanel
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -13,6 +13,7 @@ import okio.IOException
 class MyProjectService(project: Project) {
 
     private val httpClient = OkHttpClient()
+    val ui = ChatPanel(this)
 
     private fun getCatInfo(): String {
         val request = Request.Builder().url("https://catfact.ninja/fact").build()
@@ -28,7 +29,7 @@ class MyProjectService(project: Project) {
     }
 
 
-    fun getBotResponseMessage(msg: String, ui: MyToolWindowFactory.MyToolWindow) {
+    fun getBotResponseMessage(msg: String) {
         ApplicationManager.getApplication().executeOnPooledThread {
 
             val result = try {
