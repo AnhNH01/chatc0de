@@ -15,4 +15,11 @@
     <applicationListeners>
         <listener class="com.github.anhnh01.chatc0de.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
+    <actions>
+        <action id="com.github.anhnh01.chatc0de.actions.ExplainCode"
+                class="com.github.anhnh01.chatc0de.actions.ExplainCode" text="Explain Code"
+                description="Explain the selected code snippet">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>
