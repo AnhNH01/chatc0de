@@ -4,6 +4,7 @@ import com.github.anhnh01.chatc0de.ChatC0deIcons
 import com.github.anhnh01.chatc0de.services.MyProjectService
 import com.intellij.ui.JBColor
 import com.intellij.ui.OnePixelSplitter
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
@@ -72,9 +73,25 @@ class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(Bor
         }
     }
 
+    private val clearChatButton = JButton("Clear chat").apply {
+        isOpaque = false
+        addActionListener {
+            listMsg.removeAll()
+            listMsg.revalidate()
+            listMsg.repaint()
+        }
+    }
+
+    private val loadingText = JBLabel()
+
     private val actionPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
         isOpaque = false
-        add(sendMessageButton, BorderLayout.EAST)
+        val panel = JBPanel<JBPanel<*>>().apply {
+            add(clearChatButton)
+            add(sendMessageButton)
+        }
+        add(panel, BorderLayout.EAST)
+        add(JBPanel<JBPanel<*>>().apply { add(loadingText) }, BorderLayout.WEST)
     }
 
     init {
@@ -122,5 +139,10 @@ class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(Bor
         this.textArea.isEnabled = !this.textArea.isEnabled
         this.isSendingMsg = !this.isSendingMsg
         this.sendMessageButton.isEnabled = !this.sendMessageButton.isEnabled
+        this.clearChatButton.isEnabled = !this.clearChatButton.isEnabled
+        this.loadingText.text = if (isSendingMsg) "Chat bot is thinking..." else ""
     }
+
+    // function to stream text messages like chat gpt
+
 }
