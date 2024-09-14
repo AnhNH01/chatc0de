@@ -9,7 +9,7 @@ class ChatC0deIcons {
         val USER: Icon = IconLoader.getIcon("/icons/user.svg", Companion::class.java)
         val CHATBOT: Icon = IconLoader.getIcon("/icons/chatbot.svg", Companion::class.java)
         val COPY : Icon = IconLoader.getIcon("/icons/copy.svg", Companion::class.java)
-        val THUMBS_SUP: Icon = IconLoader.getIcon("/icons/thumbsup.svg", Companion::class.java)
+        val THUMBS_UP: Icon = IconLoader.getIcon("/icons/thumbsup.svg", Companion::class.java)
         val THUMBS_DOWN: Icon = IconLoader.getIcon("/icons/thumbsdown.svg", Companion::class.java)
     }
 }
