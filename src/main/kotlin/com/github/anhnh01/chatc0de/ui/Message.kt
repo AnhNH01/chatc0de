@@ -2,16 +2,15 @@ package com.github.anhnh01.chatc0de.ui
 
 import com.github.anhnh01.chatc0de.ChatC0deIcons
 import com.github.anhnh01.chatc0de.utils.notify
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
-import java.awt.Cursor
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.JEditorPane
 
@@ -21,52 +20,42 @@ class Message(content: String, isPrompt: Boolean = false) : JBPanel<JBPanel<*>>(
         isOpaque = false
     }
 
-    private val copyBtn = JBLabel(ChatC0deIcons.COPY).apply {
-        isOpaque = false
-        cursor = Cursor(Cursor.HAND_CURSOR)
-        addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent?) {
-                val stringSelection = StringSelection(content)
-                val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-                clipboard.setContents(stringSelection, null)
+    private val iconActionCopy = IconActionButton(object : AnAction("Copy", "Copy response", ChatC0deIcons.COPY) {
+        override fun actionPerformed(e: AnActionEvent) {
+            val stringSelection = StringSelection(content)
+            val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+            clipboard.setContents(stringSelection, null)
 
-                notify(
-                    "Copied",
-                    "Response copied successfully",
-                )
-            }
-        })
-    }
+            notify(
+                "Copied",
+                "Response copied successfully",
+            )
+        }
+    })
 
-    private val thumbsUpBtn = JBLabel(ChatC0deIcons.THUMBS_SUP).apply {
-        isOpaque = false
-        cursor = Cursor(Cursor.HAND_CURSOR)
-        addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent?) {
-                notify("Liked", "You have approved this response")
-            }
-        })
-    }
+    private val iconActionThumbsUp = IconActionButton(object : AnAction("Like", "Like", ChatC0deIcons.THUMBS_UP) {
+        override fun actionPerformed(e: AnActionEvent) {
+            notify("Liked", "You have approved this response")
+        }
+    })
 
-    private val thumbsDownBtn = JBLabel(ChatC0deIcons.THUMBS_DOWN).apply {
-        isOpaque = false
-        cursor = Cursor(Cursor.HAND_CURSOR)
-        addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent?) {
-                notify("Disliked", "You have disapproved this response")
-            }
-        })
-    }
+    private val iconActionThumbsDown = IconActionButton(object : AnAction("Dislike", "Dislike", ChatC0deIcons.THUMBS_DOWN) {
+        override fun actionPerformed(e: AnActionEvent) {
+            notify("Disliked", "You have disapproved this response")
+
+        }
+    })
+
 
     private val actionPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
         border = JBUI.Borders.empty(JBUI.scale(7), JBUI.scale(7), JBUI.scale(7), JBUI.scale(7))
         isOpaque = false
 
         val iconPanels = JBPanel<JBPanel<*>>().apply {
-            add(copyBtn)
+            add(iconActionCopy)
             if (!isPrompt) {
-                add(thumbsUpBtn)
-                add(thumbsDownBtn)
+                add(iconActionThumbsUp)
+                add(iconActionThumbsDown)
             }
         }
 
@@ -96,7 +85,6 @@ class Message(content: String, isPrompt: Boolean = false) : JBPanel<JBPanel<*>>(
         add(msgPanel, BorderLayout.CENTER)
         add(actionPanel, BorderLayout.SOUTH)
     }
-
 
 
 }
