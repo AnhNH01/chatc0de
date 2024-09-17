@@ -10,8 +10,7 @@ import okhttp3.Request
 import okio.IOException
 
 @Service(Service.Level.PROJECT)
-class MyProjectService(project: Project) {
-
+class MyProjectService(val project: Project) {
     private val httpClient = OkHttpClient()
     val ui = ChatPanel(this)
 
@@ -41,7 +40,6 @@ class MyProjectService(project: Project) {
 
             ApplicationManager.getApplication().invokeLater {
                 ui.addMessage(result)
-                ui.toggleSendBtn()
             }
         }
     }

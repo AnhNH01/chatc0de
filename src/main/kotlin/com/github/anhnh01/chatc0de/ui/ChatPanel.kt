@@ -1,20 +1,14 @@
 package com.github.anhnh01.chatc0de.ui
 
-import com.github.anhnh01.chatc0de.ChatC0deIcons
 import com.github.anhnh01.chatc0de.services.MyProjectService
-import com.intellij.ui.JBColor
+import com.github.anhnh01.chatc0de.ui.textarea.PromptPanel
 import com.intellij.ui.OnePixelSplitter
-import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
-import javax.swing.JButton
 import javax.swing.ScrollPaneConstants
 
 class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(BorderLayout()) {
@@ -36,63 +30,7 @@ class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(Bor
         verticalScrollBar.autoscrolls = true
     }
 
-    private val textArea = JBTextArea(5, 20).apply {
-
-        emptyText.setText("Ask anything...")
-        lineWrap = true
-        wrapStyleWord = true
-        border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
-        autoscrolls = true
-        background = JBColor(0xFFFFFF, 0x303134)
-        foreground = JBColor(0x303134, 0xFFFFFF)
-        caretColor = JBColor(0x303134, 0xFFFFFF)
-
-        addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(e: KeyEvent) {
-                if (e.keyCode == KeyEvent.VK_ENTER) {
-                    if (e.isShiftDown)
-                        insert("\n", caretPosition)
-                    else {
-                        e.consume()
-
-                        // Only allow for one message at one time, user have to wait for the bot to respond before
-                        // sending another message
-                        if (!isSendingMsg) sendMessage(text.trim())
-                    }
-                } else {
-                    super.keyPressed(e)
-                }
-
-            }
-        })
-    }
-    private val sendMessageButton = JButton("Send", ChatC0deIcons.SEND).apply {
-        isOpaque = false
-        addActionListener {
-            sendMessage(textArea.text)
-        }
-    }
-
-    private val clearChatButton = JButton("Clear chat").apply {
-        isOpaque = false
-        addActionListener {
-            listMsg.removeAll()
-            listMsg.revalidate()
-            listMsg.repaint()
-        }
-    }
-
-    private val loadingText = JBLabel()
-
-    private val actionPanel = JBPanel<JBPanel<*>>(BorderLayout()).apply {
-        isOpaque = false
-        val panel = JBPanel<JBPanel<*>>().apply {
-            add(clearChatButton)
-            add(sendMessageButton)
-        }
-        add(panel, BorderLayout.EAST)
-        add(JBPanel<JBPanel<*>>().apply { add(loadingText) }, BorderLayout.WEST)
-    }
+    val promptPanel = PromptPanel(service.project, ::sendMessage, ::clearConversation)
 
     init {
         val splitter = OnePixelSplitter(true, .98f)
@@ -101,30 +39,15 @@ class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(Bor
         add(splitter)
         splitter.firstComponent = listMsgScrollPane
 
-        val inputPanel = JBPanel<JBPanel<*>>().apply {
-            layout = BorderLayout()
-            background = JBColor(0xFFFFFF, 0x303134)
-            border = JBUI.Borders.customLineTop(JBUI.CurrentTheme.Editor.BORDER_COLOR)
-            isOpaque = true
-            val textPane = JBScrollPane(textArea).apply {
-                border = null
-            }
-
-            add(textPane, BorderLayout.CENTER)
-            add(actionPanel, BorderLayout.SOUTH)
-        }
-
-        add(inputPanel, BorderLayout.SOUTH)
+        add(promptPanel, BorderLayout.SOUTH)
     }
 
 
     fun sendMessage(msg: String) {
         val msgContent = msg.trim()
-        this.textArea.text = ""
         if (msgContent.isEmpty() || isSendingMsg) {
             return
         }
-        toggleSendBtn()
         addMessage(msgContent, true)
         this.service.getBotResponseMessage(msgContent)
     }
@@ -135,14 +58,11 @@ class ChatPanel(private val service: MyProjectService) : JBPanel<JBPanel<*>>(Bor
         listMsg.repaint()
     }
 
-    fun toggleSendBtn() {
-        this.textArea.isEnabled = !this.textArea.isEnabled
-        this.isSendingMsg = !this.isSendingMsg
-        this.sendMessageButton.isEnabled = !this.sendMessageButton.isEnabled
-        this.clearChatButton.isEnabled = !this.clearChatButton.isEnabled
-        this.loadingText.text = if (isSendingMsg) "Chat bot is thinking..." else ""
+    fun clearConversation() {
+        listMsg.removeAll()
+        listMsg.revalidate()
+        listMsg.repaint()
     }
-
     // function to stream text messages like chat gpt
 
 }

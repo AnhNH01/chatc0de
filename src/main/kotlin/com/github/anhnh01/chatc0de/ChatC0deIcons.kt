@@ -11,5 +11,6 @@ class ChatC0deIcons {
         val COPY : Icon = IconLoader.getIcon("/icons/copy.svg", Companion::class.java)
         val THUMBS_UP: Icon = IconLoader.getIcon("/icons/thumbsup.svg", Companion::class.java)
         val THUMBS_DOWN: Icon = IconLoader.getIcon("/icons/thumbsdown.svg", Companion::class.java)
+        val REFRESH: Icon = IconLoader.getIcon("/icons/refresh.svg", Companion::class.java)
     }
 }
