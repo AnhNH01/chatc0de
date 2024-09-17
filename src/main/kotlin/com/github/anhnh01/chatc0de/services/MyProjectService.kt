@@ -7,7 +7,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okio.IOException
+import java.io.IOException
 
 @Service(Service.Level.PROJECT)
 class MyProjectService(val project: Project) {
